@@ -4,7 +4,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { QuoteModalComponent } from '../quote-modal/quote-modal.component';
 import { QuoteService } from '../quote.service';
 import { TodoService } from '../todo.service';
-import { concatMap, map } from 'rxjs/operators';
+import { concatMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-list-todo',
@@ -42,7 +42,6 @@ export class ListTodoComponent implements OnInit {
   complete(todo) {
     this.todoService.completeTodo({...todo}).pipe(
       concatMap(() => this.quoteService.getQuote()),
-      map((result: any) => result.quotes[0]),
       concatMap((quote: any) => {
         const modalRef = this.modalService.open(QuoteModalComponent);
         modalRef.componentInstance.quote = quote;
