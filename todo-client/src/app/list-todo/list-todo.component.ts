@@ -1,11 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { QuoteModalComponent } from '../quote-modal/quote-modal.component';
+import { QuoteService } from '../quote.service';
 import { TodoService } from '../todo.service';
+import { concatMap, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-list-todo',
   templateUrl: './list-todo.component.html',
-  styleUrls: ['./list-todo.component.css']
+  styleUrls: ['./list-todo.component.css'],
+  providers: [TodoService, QuoteService]
 })
 export class ListTodoComponent implements OnInit {
   todos = []
@@ -13,7 +18,9 @@ export class ListTodoComponent implements OnInit {
   constructor(
     private todoService: TodoService,
     private router: Router, 
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private modalService: NgbModal,
+    private quoteService: QuoteService
     ) { }
 
   ngOnInit() {
@@ -33,9 +40,15 @@ export class ListTodoComponent implements OnInit {
   }
 
   complete(todo) {
-    this.todoService.completeTodo({...todo}).subscribe(() => {
-      this.getTodos()
-    });
+    this.todoService.completeTodo({...todo}).pipe(
+      concatMap(() => this.quoteService.getQuote()),
+      map((result: any) => result.quotes[0]),
+      concatMap((quote: any) => {
+        const modalRef = this.modalService.open(QuoteModalComponent);
+        modalRef.componentInstance.quote = quote;
+        return modalRef.result;
+      })
+    ).subscribe(() => this.getTodos())
   }
 
   add() {

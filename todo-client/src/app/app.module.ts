@@ -8,12 +8,14 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CreateTodoComponent } from './create-todo/create-todo.component';
 import { ListTodoComponent } from './list-todo/list-todo.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { QuoteModalComponent } from './quote-modal/quote-modal.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     CreateTodoComponent,
-    ListTodoComponent
+    ListTodoComponent,
+    QuoteModalComponent
   ],
   imports: [
     BrowserModule,
