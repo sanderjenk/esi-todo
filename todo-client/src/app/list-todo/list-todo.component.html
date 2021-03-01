@@ -1,0 +1,26 @@
+<div class="container">
+    <h1>Todo items</h1>
+    <div>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Done</th>
+            <th scope="col"><button class="btn btn-success" (click)="add()">Add</button></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let todo of todos">
+            <td>{{ todo.name }}</td>
+            <td>{{ todo.done ? "Yes" : "No" }}</td>
+            <td>
+              <div class="btn-group">
+                <button class="btn btn-danger" (click)="delete(todo)">Delete</button>
+                <button *ngIf="!todo.done" class="btn btn-primary" (click)="complete(todo)">Complete</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
