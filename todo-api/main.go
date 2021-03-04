@@ -7,17 +7,13 @@ import (
 	"net/http"
 	"strconv"
 
+	t "esi-todo/todo-api/todo"
+
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
-type Todo struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
-	Done bool   `json:"done"`
-}
-
-var todos []Todo
+var todos []t.Todo
 
 func homePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Welcome to the HomePage!")
@@ -60,21 +56,20 @@ func getTodo(w http.ResponseWriter, r *http.Request) {
 }
 
 func createTodo(w http.ResponseWriter, r *http.Request) {
-	var todo Todo
+	var todo t.Todo
 	json.NewDecoder(r.Body).Decode(&todo)
 	todo.Id = strconv.Itoa(len(todos) + 1)
 	todos = append(todos, todo)
+	json.NewEncoder(w).Encode(todo)
 }
 
 func updateTodo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	key := vars["id"]
 
-	var newTodo Todo
+	var newTodo t.Todo
 	json.NewDecoder(r.Body).Decode(&newTodo)
 	newTodo.Id = key
-
-	fmt.Println(newTodo)
 
 	var index int
 	var found bool
@@ -113,12 +108,12 @@ func deleteTodo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func remove(slice []Todo, s int) []Todo {
+func remove(slice []t.Todo, s int) []t.Todo {
 	return append(slice[:s], slice[s+1:]...)
 }
 
 func main() {
-	todos = []Todo{
+	todos = []t.Todo{
 		{Id: "1", Name: "Clean room", Done: false},
 		{Id: "2", Name: "Work out", Done: false},
 		{Id: "3", Name: "Cook carbonara", Done: false},
