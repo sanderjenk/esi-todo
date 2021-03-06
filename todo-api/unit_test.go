@@ -3,12 +3,11 @@
 package main
 
 import (
-	todo "esi-todo/todo-api/todo"
 	"testing"
 )
 
 func TestAddNewTodo(t *testing.T) {
-	testTodo := todo.Todo{
+	testTodo := Todo{
 		Id:   "142",
 		Name: "Do homework",
 		Done: false,
@@ -22,13 +21,13 @@ func TestAddNewTodo(t *testing.T) {
 }
 
 func TestChangeTodo(t *testing.T) {
-	testTodo := todo.Todo{
+	testTodo := Todo{
 		Id:   "142",
 		Name: "Do homework",
 		Done: false,
 	}
 	addNewTodo(testTodo)
-	modifiedTodo := todo.Todo{
+	modifiedTodo := Todo{
 		Id:   "142",
 		Name: "Go jogging",
 		Done: false,
@@ -42,7 +41,7 @@ func TestChangeTodo(t *testing.T) {
 }
 
 func TestRemoveTodo(t *testing.T) {
-	testTodo := todo.Todo{
+	testTodo := Todo{
 		Id:   "142",
 		Name: "Do homework",
 		Done: false,

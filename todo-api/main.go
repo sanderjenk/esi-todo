@@ -7,13 +7,17 @@ import (
 	"net/http"
 	"strconv"
 
-	t "esi-todo/todo-api/todo"
-
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
-var todos []t.Todo
+type Todo struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+	Done bool   `json:"done"`
+}
+
+var todos []Todo
 
 func homePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Welcome to the HomePage!")
@@ -38,8 +42,8 @@ func getTodos(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(todos)
 }
 
-func findTodo(id string) (t.Todo, bool) {
-	var task t.Todo
+func findTodo(id string) (Todo, bool) {
+	var task Todo
 	for _, todo := range todos {
 		if todo.Id == id {
 			return todo, true
@@ -61,19 +65,19 @@ func getTodo(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(todo)
 }
 
-func addNewTodo(todo t.Todo) {
+func addNewTodo(todo Todo) {
 	todos = append(todos, todo)
 }
 
 func createTodo(w http.ResponseWriter, r *http.Request) {
-	var todo t.Todo
+	var todo Todo
 	json.NewDecoder(r.Body).Decode(&todo)
 	todo.Id = strconv.Itoa(len(todos) + 1)
 	addNewTodo(todo)
 	json.NewEncoder(w).Encode(todo)
 }
 
-func changeTodo(id string, newTodo t.Todo) bool {
+func changeTodo(id string, newTodo Todo) bool {
 	var index int
 	var found bool
 	for i, todo := range todos {
@@ -95,7 +99,7 @@ func updateTodo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	key := vars["id"]
 
-	var newTodo t.Todo
+	var newTodo Todo
 	json.NewDecoder(r.Body).Decode(&newTodo)
 	newTodo.Id = key
 
@@ -125,12 +129,12 @@ func deleteTodo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func remove(slice []t.Todo, s int) []t.Todo {
+func remove(slice []Todo, s int) []Todo {
 	return append(slice[:s], slice[s+1:]...)
 }
 
 func main() {
-	todos = []t.Todo{
+	todos = []Todo{
 		{Id: "1", Name: "Clean room", Done: false},
 		{Id: "2", Name: "Work out", Done: false},
 		{Id: "3", Name: "Cook carbonara", Done: false},
