@@ -38,43 +38,46 @@ func getTodos(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(todos)
 }
 
+func findTodo(id string) (t.Todo, bool) {
+	var task t.Todo
+	for _, todo := range todos {
+		if todo.Id == id {
+			return todo, true
+		}
+	}
+	return task, false
+}
+
 func getTodo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	key := vars["id"]
 
-	found := false
-	for _, todo := range todos {
-		if todo.Id == key {
-			found = true
-			json.NewEncoder(w).Encode(todo)
-		}
-	}
+	todo, found := findTodo(key)
 
 	if !found {
 		w.WriteHeader(http.StatusNotFound)
 	}
+
+	json.NewEncoder(w).Encode(todo)
+}
+
+func addNewTodo(todo t.Todo) {
+	todos = append(todos, todo)
 }
 
 func createTodo(w http.ResponseWriter, r *http.Request) {
 	var todo t.Todo
 	json.NewDecoder(r.Body).Decode(&todo)
 	todo.Id = strconv.Itoa(len(todos) + 1)
-	todos = append(todos, todo)
+	addNewTodo(todo)
 	json.NewEncoder(w).Encode(todo)
 }
 
-func updateTodo(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	key := vars["id"]
-
-	var newTodo t.Todo
-	json.NewDecoder(r.Body).Decode(&newTodo)
-	newTodo.Id = key
-
+func changeTodo(id string, newTodo t.Todo) bool {
 	var index int
 	var found bool
 	for i, todo := range todos {
-		if todo.Id == key {
+		if todo.Id == id {
 			index = i
 			found = true
 		}
@@ -85,25 +88,39 @@ func updateTodo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	todos = append(todos, newTodo)
+	return found
+}
+
+func updateTodo(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	key := vars["id"]
+
+	var newTodo t.Todo
+	json.NewDecoder(r.Body).Decode(&newTodo)
+	newTodo.Id = key
+
+	changeTodo(key, newTodo)
+}
+
+func removeTodo(id string) bool {
+	for i, todo := range todos {
+		if todo.Id == id {
+			todos = remove(todos, i)
+			return true
+		}
+	}
+	return false
 }
 
 func deleteTodo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	key := vars["id"]
 
-	var found bool
-	var index int
-	for i, todo := range todos {
-		if todo.Id == key {
-			index = i
-			found = true
-		}
-	}
+	found := removeTodo(key)
 
 	if !found {
 		w.WriteHeader(http.StatusNotFound)
 	} else {
-		todos = remove(todos, index)
 		w.WriteHeader(http.StatusNoContent)
 	}
 }
