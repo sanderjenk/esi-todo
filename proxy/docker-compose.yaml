@@ -8,6 +8,7 @@ services:
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
+
       - "--entrypoints.web.address=:8080"
       - "--entrypoints.traefik.address=:8000"
     ports:
@@ -33,4 +34,3 @@ services:
       - "traefik.http.routers.api_backend.entrypoints=web"
       - "traefik.http.routers.api_backend.middlewares=remove-api"
       - "traefik.http.middlewares.remove-api.stripprefix.prefixes=/api"
-
