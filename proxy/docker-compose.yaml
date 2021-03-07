@@ -1,0 +1,38 @@
+version: '3.3'
+services:
+  traefik:
+    image: "traefik:v2.0.0-rc3"
+    container_name: "traefik"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:8080"
+      - "--entrypoints.traefik.address=:8000"
+    ports:
+      - "8080:8080"
+      - "8000:8000"
+    volumes: 
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      
+  mystery_backend:
+    image: radhifadlillah/shiori
+    expose: 
+      - "8080:8080"
+    labels: 
+      - "traefik.enable=true"
+      - "traefik.http.routers.mystery_backend.rule=Host(`localhost`) && PathPrefix(`/mystery`)"
+      - "traefik.http.routers.mystery_backend.entrypoints=web"
+      - "traefik.http.routers.mystery_backend.middlewares=remove-mystery"
+      - "traefik.http.middlewares.remove-mystery.stripprefix.prefixes=/mystery"
+
+  api_backend:
+    build: ../../todo-api
+    expose: 
+      - "8080:8000"
+    labels: 
+      - "traefik.enable=true"
+      - "traefik.http.routers.api_backend.rule=Host(`localhost`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.api_backend.entrypoints=web"
+      - "traefik.http.routers.api_backend.middlewares=remove-api"
+      - "traefik.http.middlewares.remove-api.stripprefix.prefixes=/api"
