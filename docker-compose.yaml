@@ -4,9 +4,14 @@ services:
     build: ./todo-api
     ports:
       - "8000:8000"
+    command: go test
     
   client:
     build: ./todo-client
     ports: 
       - "4200:80"
-    
+
+  tests:
+    build:
+      context: .
+      dockerfile: ./todo-api/Dockerfile.test
